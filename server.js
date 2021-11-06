@@ -34,7 +34,7 @@ app.get('/login', function (req, res) {
   res.redirect(spotifyApi.createAuthorizeURL(scope, state = '12345'));
 });
 
-app.get('/callback', (req, res) => {
+app.get('/callback', async (req, res) => {
 
   let {
     error,
@@ -44,21 +44,13 @@ app.get('/callback', (req, res) => {
   if (error) {
     res.send(`Error: ${error}`)
   } else {
-    res.redirect(`/access_token/${code}`)
+
+    let data = await spotifyApi.authorizationCodeGrant(code)
+    refreshToken = data.body.refresh_token;
+    spotifyApi.setAccessToken(data.body['access_token']);
+    spotifyApi.setRefreshToken(data.body['refresh_token']);
+    res.redirect('/')
   }
-})
-
-app.get('/access_token/:code', async (req, res) => {
-
-  const {
-    code
-  } = req.params;
-
-  let data = await spotifyApi.authorizationCodeGrant(code)
-  refreshToken = data.body.refresh_token;
-  spotifyApi.setAccessToken(data.body['access_token']);
-  spotifyApi.setRefreshToken(data.body['refresh_token']);
-  res.redirect('/')
 })
 
 app.listen(PORT, () => {
