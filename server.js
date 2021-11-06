@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const axios = require('axios');
 
 var SpotifyWebApi = require('spotify-web-api-node');
 
@@ -21,13 +20,13 @@ var spotifyApi = new SpotifyWebApi({
 
 app.get('/', async (req, res) => {
 
-  try{
+  try {
     let data = await spotifyApi.getMyCurrentPlayingTrack()
     res.send(ResponseJSON(200, 'Success', data))
-  }catch(err){
+  } catch (err) {
     res.redirect('/login')
   }
-  
+
 })
 
 app.get('/login', function (req, res) {
@@ -56,15 +55,9 @@ app.get('/access_token/:code', async (req, res) => {
   } = req.params;
 
   let data = await spotifyApi.authorizationCodeGrant(code)
-  // res.send(data.body)
   refreshToken = data.body.refresh_token;
   spotifyApi.setAccessToken(data.body['access_token']);
   spotifyApi.setRefreshToken(data.body['refresh_token']);
-
-  console.log(data.body['access_token'])
-  console.log("=============")
-  console.log(data.body['refresh_token'])
-
   res.redirect('/')
 })
 
@@ -79,5 +72,3 @@ function ResponseJSON(status, message, data) {
     data
   }
 }
-
-// AQCaiChNn5PgKLqOq-QmnU9Si548lxt2KDcCuW7Tgn1bOnr2tEcyOqxRiOrJjeK5Tsy-KfYJJC4a2QKXIJkFnOzGU_4szCTJDSTH8oMsRTRccTLDkBIPriMtZwYQiz1Q7lg
